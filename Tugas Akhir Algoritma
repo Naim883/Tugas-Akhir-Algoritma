@@ -1,0 +1,160 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define PIN "12250515234"
+
+float saldo = 3500000; 
+
+const int MAX_PERCOBAAN_SALAH = 3;
+int percobaanSalah = 0;
+
+int masukkanPIN() {
+    char inputPIN[5];
+    printf("Masukkan PIN Anda: ");
+    scanf("%s", inputPIN);
+    if (strcmp(inputPIN, PIN) == 0) {
+        return 1;
+    } else {
+        percobaanSalah++;
+        if (percobaanSalah >= MAX_PERCOBAAN_SALAH) {
+            printf("PIN yang Anda masukkan salah lebih dari 3 kali. Kartu Anda diblokir.\n");
+            exit(0); 
+        } else {
+            printf("PIN yang Anda masukkan salah. Sisa percobaan: %d\n", MAX_PERCOBAAN_SALAH - percobaanSalah);
+            return 0;
+        }
+    }
+}
+//Nama : Naimul Hasan Siregar
+//NIM : 12250515234
+
+void tampilkanMenu() {
+    printf("=== Menu ATM ===\n");
+    printf("1. Cek Saldo\n");
+    printf("2. Tarik Tunai\n");
+    printf("3. Setor Tunai\n");
+    printf("4. Bayar Tagihan Institusi\n");
+    printf("5. Top Up Gopay/OVO\n");
+    printf("6. Keluar\n");
+    printf("Pilih opsi: ");
+}
+
+void cekSaldo() {
+    printf("Saldo Anda: Rp%.2f\n", saldo);
+}
+
+void tarikTunai(int jumlah) {
+    if ((jumlah % 50000 != 0 && jumlah % 100000 != 0) || jumlah > saldo) {
+        printf("Penarikan uang gagal. Silakan masukkan jumlah yang valid (hanya dalam pecahan 50.000 dan 100.000).\n");
+    } else {
+        saldo -= jumlah;
+        printf("Anda menarik Rp%d. Saldo Anda sekarang: Rp%.2f\n", jumlah, saldo);
+    }
+}
+
+void setorTunai(float jumlah) {
+    saldo += jumlah;
+    printf("Anda menyetor Rp%.2f. Saldo Anda sekarang: Rp%.2f\n", jumlah, saldo);
+}
+
+void bayarTagihan(char *institusi, float jumlah) {
+    if (jumlah > saldo) {
+        printf("Saldo tidak mencukupi.\n");
+    } else {
+        saldo -= jumlah;
+        printf("Pembayaran kepada %s sejumlah Rp%.2f berhasil. Saldo Anda sekarang: Rp%.2f\n", institusi, jumlah, saldo);
+    }
+}
+
+void topUpGopay(float jumlah, char *nomorTujuan, float biayaAdmin) {
+    if (saldo < jumlah + biayaAdmin) {
+        printf("Saldo tidak mencukupi untuk melakukan top up Gopay.\n");
+    } else {
+        saldo -= (jumlah + biayaAdmin);
+        printf("Top up Anda ke nomor %s sejumlah Rp%.2f berhasil. Biaya admin: Rp%.2f. Saldo Anda sekarang: Rp%.2f\n", nomorTujuan, jumlah, biayaAdmin, saldo);
+    }
+}
+
+void topUpOVO(float jumlah, char *nomorTujuan, float biayaAdmin) {
+    if (saldo < jumlah + biayaAdmin) {
+        printf("Saldo tidak mencukupi untuk melakukan top up OVO.\n");
+    } else {
+        saldo -= (jumlah + biayaAdmin);
+        printf("Top up Anda ke nomor %s sejumlah Rp%.2f berhasil. Biaya admin: Rp%.2f. Saldo Anda sekarang: Rp%.2f\n", nomorTujuan, jumlah, biayaAdmin, saldo);
+    }
+}
+
+int main() {
+    int pilihan;
+    float jumlah;
+    char institusi[50];
+    char nomorTujuan[20];
+    float biayaAdmin;
+
+    printf("Masukkan kartu ATM Anda.\n");
+
+    while (!masukkanPIN()) {}
+
+    do {
+        tampilkanMenu();
+        scanf("%d", &pilihan);
+
+        switch (pilihan) {
+            case 1:
+                cekSaldo();
+                break;
+            case 2:
+                printf("Masukkan jumlah yang ingin Anda tarik: Rp");
+                scanf("%f", &jumlah);
+                tarikTunai(jumlah);
+                break;
+            case 3:
+                printf("Masukkan jumlah yang ingin Anda setor: Rp");
+                scanf("%f", &jumlah);
+                setorTunai(jumlah);
+                break;
+            case 4:
+                fflush(stdin); 
+                printf("Masukkan nama institusi: ");
+                fgets(institusi, 50, stdin);
+                institusi[strcspn(institusi, "\n")] = '\0';
+                printf("Masukkan jumlah yang ingin Anda bayar: Rp");
+                scanf("%f", &jumlah);
+                bayarTagihan(institusi, jumlah);
+                break;
+            case 5:
+                printf("=== Top Up Gopay/OVO ===\n");
+                printf("Masukkan nomor tujuan: ");
+                scanf("%s", nomorTujuan);
+                printf("Masukkan jumlah yang ingin Anda top up: Rp");
+                scanf("%f", &jumlah);
+                printf("Masukkan biaya admin: Rp");
+                scanf("%f", &biayaAdmin);
+                printf("Pilih opsi:\n");
+                printf("1. Top Up Gopay\n");
+                printf("2. Top Up OVO\n");
+                printf("Pilihan: ");
+                int topUpOption;
+                scanf("%d", &topUpOption);
+                switch (topUpOption) {
+                    case 1:
+                        topUpGopay(jumlah, nomorTujuan, biayaAdmin);
+                        break;
+                    case 2:
+                        topUpOVO(jumlah, nomorTujuan, biayaAdmin);
+                        break;
+                    default:
+                        printf("Pilihan tidak valid.\n");
+                }
+                break;
+            case 6:
+                printf("Terima kasih. Sampai jumpa!");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+        }
+    } while (pilihan != 6);
+
+    return 0;
+}

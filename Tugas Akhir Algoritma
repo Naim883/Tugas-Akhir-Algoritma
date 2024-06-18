@@ -149,7 +149,7 @@ int main() {
                 }
                 break;
             case 6:
-                printf("Terima kasih. Sampai jumpa!");
+                printf("Terima kasih atas transaksi anda");
                 break;
             default:
                 printf("Pilihan tidak valid.\n");
